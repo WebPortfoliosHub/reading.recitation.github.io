@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+    <title>Read And Recitations Quran</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        i {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+   <div class="container-fluid bg-success">
+    <h1 class="text-white text-center p-3">Quran Reading and Recitation</h1>
+   </div>
+    <section class="quran-section py-5 mt-5" id="myDemo">
+        <div class="container">
+            <h2 class="text-center mb-4 heading-green">Explore the Quran</h2>
+
+            <!-- Search Input -->
+            <input type="text" class="form-control mb-4" id="surahSearch" placeholder="Search for Surah...">
+
+            <!-- Surah Card Container -->
+            <div class="row justify-content-center" id="surahCard">
+                <!-- Surah Cards will appear here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let allSurahs = [];
+
+        // Fetch Surah Data from API
+        fetch('https://api.alquran.cloud/v1/surah')
+            .then(response => response.json())
+            .then(data => {
+                allSurahs = data.data;
+                displaySurahs(allSurahs); // Display all Surahs initially
+            })
+            .catch(error => console.error('Error fetching Surah data:', error));
+
+        // Display Surahs on the page
+        function displaySurahs(surahs) {
+            const surahCardContainer = document.getElementById('surahCard');
+            surahCardContainer.innerHTML = ''; // Clear previous results
+
+            surahs.forEach(surah => {
+                const formattedSurahNumber = surah.number.toString().padStart(3, '0');
+                const surahCard = `
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card p-3">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">${surah.englishName}</h5>
+                                <p class="card-text">${surah.englishNameTranslation} - Surah ${surah.number} (${surah.numberOfAyahs} Ayahs)</p>
+                                <select class="form-select mb-3">
+                                    <option value="en">English Translation</option>
+                                    <option value="ar">Arabic (Original)</option>
+                                </select>
+                                <a href="https://quran.com/${surah.number}" target="_blank" class="btn btn-outline-primary">Read Surah</a>
+                                <button class="btn btn-outline-success" onclick="playAudio(${surah.number})">Listen to Surah</button>
+                                <div id="audioPlayer${surah.number}"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                surahCardContainer.innerHTML += surahCard;
+            });
+        }
+
+        // Search and Filter Surahs
+        document.getElementById('surahSearch').addEventListener('input', function () {
+            const searchValue = this.value.toLowerCase();
+            const filteredSurahs = allSurahs.filter(surah =>
+                surah.englishName.toLowerCase().includes(searchValue)
+            );
+            displaySurahs(filteredSurahs);
+        });
+
+        // Function to play audio for the Surah
+        // Function to play audio for the Surah
+        // Function to play audio for the Surah
+        async function playAudio(surahNumber) {
+            const reciterId = 1; // Replace with the desired reciter ID
+            const apiUrl = `https://api.quran.com/api/v4/chapter_recitations/${reciterId}/${surahNumber}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                const audioUrl = data.audio_file.audio_url;
+
+                // Check if the audio player already exists
+                const audioContainer = document.getElementById(`audioPlayer${surahNumber}`);
+                audioContainer.innerHTML = ''; // Clear previous audio player
+
+                // Create and append the audio element dynamically
+                const audioElement = document.createElement('audio');
+                audioElement.controls = true;
+                audioElement.src = audioUrl;
+
+                audioElement.addEventListener('error', function () {
+                    alert('Audio failed to load. Please try again later.');
+                });
+
+                audioContainer.appendChild(audioElement);
+                audioElement.play(); // Try to play the audio immediately
+            } catch (error) {
+                console.error('Error fetching audio URL:', error);
+                alert('Failed to load audio. Please try again later.');
+            }
+        }
+
+
+    </script>
+
+    <!-- Footer Section -->
+    <footer class="bg-success text-white text-center py-4 mt-5">
+        <div class="container py-2">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="myColor">Contact Information</h3>
+                    <p><b class="text-white">Email</b>: <a class="text-white"
+                            href="mailto:faisalmahmood3535@gmail.com">faisalmahmood3535q@gmail.com</a></p>
+                    <p><b class="myColor">Phone</b>: +92 308 3470930</p>
+                    <p><b class="myColor">Address</b>: Lahore, Islamabad, Pakistan</p>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="myColor">Follow Me</h5>
+                    <br>
+                    <span><a href="https://www.facebook.com/profile.php?id=100009174911917&amp;mibextid=ZbWKwL"
+                            target="_blank"><i class="fa-brands fa-facebook mx-2"></i></a></span>
+                    <span><a href="https://www.linkedin.com/in/faisal-mahmood-183111246/" target="_blank"><i
+                                class="fa-brands fa-linkedin mx-2"></i></a></span>
+                    <span><a href="https://instagram.com/faisalmahmood786q" target="_blank"><i
+                                class="fa-brands fa-instagram mx-2"></i></a></span>
+                    <span><a href="https://api.whatsapp.com/send?phone=923083470930" target="_blank"><i
+                                class="fab fa-whatsapp mx-2"></i></a></span><br>
+                </div>
+            </div>
+            <div class="mt-3">
+                <p>© <span id="currentYear">2025</span> <b><span>Faisal</span> <span class="myColor">Mahmood</span></b>
+                    All rights reserved.</p>
+            </div>
+            <a href="#myDemo"><i class="fas fa-arrow-circle-up"></i></a>
+        </div>
+    </footer>
+</body>
+
+</html>
